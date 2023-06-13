@@ -13,6 +13,17 @@
 </div>
 <br>
 
+### Installation
+```javascript
+$ yarn add iconly
+```
+<sup>or</sup>
+```javascript
+$ npm i iconly
+```
+
+<br>
+
 ### Import
 ```javascript
 import Iconly from 'iconly'
