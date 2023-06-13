@@ -1,0 +1,32 @@
+{
+  "name": "iconly",
+  "version": "0.0.1",
+  "description": "SVG Sprite",
+  "author": "ux-ui.pro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ux-ui-pro/iconly.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ux-ui-pro/iconly/issues"
+  },
+  "source": "src/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "scripts": {
+    "serve": "parcel watch",
+    "build": "parcel build",
+    "clean": "rm -rf dist .parcel-cache"
+  },
+  "devDependencies": {
+    "parcel": "~2.9.2"
+  },
+  "keywords": [
+    "svg",
+    "icon",
+    "icons",
+    "sprite",
+    "localStorage"
+  ]
+}
