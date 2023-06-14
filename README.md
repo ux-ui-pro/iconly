@@ -7,19 +7,15 @@
 [![GitHub package version](https://img.shields.io/github/package-json/v/ux-ui-pro/iconly.svg)](https://github.com/ux-ui-pro/iconly)
 [![NPM Downloads](https://img.shields.io/npm/dm/iconly.svg?style=flat)](https://www.npmjs.org/package/iconly)
 
-<sup><a href="https://bundlephobia.com/package/iconly">500B gzipped</a></sup>
+<sup>500B gzipped</sup>
 <h3><a href="https://codepen.io/ux-ui/pen/zYmyqWR">Demo</a></h3>
 
 </div>
 <br>
 
 ### Installation
-```javascript
-$ yarn add iconly
 ```
-<sup>or</sup>
-```javascript
-$ npm i iconly
+$ yarn add iconly
 ```
 
 <br>
