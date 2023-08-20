@@ -18,7 +18,7 @@ class $4fa36e821943b400$export$2e2bcd8739ae039 {
         this.init().then();
     }
     async init() {
-        const { file: file , revision: revision  } = this.options;
+        const { file: file, revision: revision } = this.options;
         if (this.isLocalStorage && localStorage.getItem("inlineSVGrev") === revision) {
             const data = localStorage.getItem("inlineSVGdata");
             if (data) {
@@ -26,6 +26,7 @@ class $4fa36e821943b400$export$2e2bcd8739ae039 {
                 return;
             }
         }
+        if (document.querySelector("#iconset")) return;
         try {
             const response = await fetch(file);
             if (!response.ok) throw new Error("Network response was not ok");

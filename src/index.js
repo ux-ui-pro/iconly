@@ -3,6 +3,7 @@ export default class Iconly {
 		this.options = { ...options }
 		this.isLocalStorage = !!(window['localStorage'])
 		this.body = document.body
+
 		this.init().then()
 	}
 
@@ -11,11 +12,15 @@ export default class Iconly {
 
 		if (this.isLocalStorage && localStorage.getItem('inlineSVGrev') === revision) {
 			const data = localStorage.getItem('inlineSVGdata')
+
 			if (data) {
 				this.insert(data)
+
 				return
 			}
 		}
+
+		if (document.querySelector('#iconset')) return
 
 		try {
 			const response = await fetch(file)
@@ -25,6 +30,7 @@ export default class Iconly {
 			}
 
 			const data = await response.text()
+
 			this.insert(data)
 
 			if (this.isLocalStorage) {
