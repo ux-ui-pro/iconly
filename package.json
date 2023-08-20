@@ -1,6 +1,6 @@
 {
   "name": "iconly",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "SVG Sprite",
   "author": "ux-ui.pro",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "clean": "rm -rf dist .parcel-cache"
   },
   "devDependencies": {
-    "parcel": "~2.9.2"
+    "parcel": "~2.9.3"
   },
   "keywords": [
     "svg",
