@@ -8,37 +8,43 @@ export default class Iconly {
 	}
 
 	async init() {
-		const { file, revision } = this.options
-
-		if (this.isLocalStorage && localStorage.getItem('inlineSVGrev') === revision) {
-			const data = localStorage.getItem('inlineSVGdata')
-
-			if (data) {
-				this.insert(data)
-
-				return
-			}
-		}
+		const { file } = this.options
 
 		if (document.querySelector('#iconset')) return
 
-		try {
-			const response = await fetch(file)
+		if (this.isLocalStorage) {
+			const storedSize = localStorage.getItem('inlineSVGsize')
 
-			if (!response.ok) {
-				throw new Error('Network response was not ok')
+			try {
+				const response = await fetch(file)
+
+				if (!response.ok) throw new Error('Network response was not ok')
+
+				const data = await response.text()
+
+				if (storedSize && storedSize === data.length.toString()) {
+					this.insert(localStorage.getItem('inlineSVGdata'))
+				} else {
+					this.insert(data)
+
+					localStorage.setItem('inlineSVGdata', data)
+					localStorage.setItem('inlineSVGsize', data.length.toString())
+				}
+			} catch (error) {
+				console.error('There was a problem with the network fetch operation:', error)
 			}
+		} else {
+			try {
+				const response = await fetch(file)
 
-			const data = await response.text()
+				if (!response.ok) throw new Error('Network response was not ok')
 
-			this.insert(data)
+				const data = await response.text()
 
-			if (this.isLocalStorage) {
-				localStorage.setItem('inlineSVGdata', data)
-				localStorage.setItem('inlineSVGrev', revision)
+				this.insert(data)
+			} catch (error) {
+				console.error('There was a problem with the network fetch operation:', error)
 			}
-		} catch (error) {
-			console.error('There was a problem with the network fetch operation:', error)
 		}
 	}
 

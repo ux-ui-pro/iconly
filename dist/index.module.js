@@ -8,24 +8,28 @@ class $cf838c15c8b009ba$export$2e2bcd8739ae039 {
         this.init().then();
     }
     async init() {
-        const { file: file, revision: revision } = this.options;
-        if (this.isLocalStorage && localStorage.getItem("inlineSVGrev") === revision) {
-            const data = localStorage.getItem("inlineSVGdata");
-            if (data) {
-                this.insert(data);
-                return;
-            }
-        }
+        const { file: file } = this.options;
         if (document.querySelector("#iconset")) return;
-        try {
+        if (this.isLocalStorage) {
+            const storedSize = localStorage.getItem("inlineSVGsize");
+            try {
+                const response = await fetch(file);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.text();
+                if (storedSize && storedSize === data.length.toString()) this.insert(localStorage.getItem("inlineSVGdata"));
+                else {
+                    this.insert(data);
+                    localStorage.setItem("inlineSVGdata", data);
+                    localStorage.setItem("inlineSVGsize", data.length.toString());
+                }
+            } catch (error) {
+                console.error("There was a problem with the network fetch operation:", error);
+            }
+        } else try {
             const response = await fetch(file);
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.text();
             this.insert(data);
-            if (this.isLocalStorage) {
-                localStorage.setItem("inlineSVGdata", data);
-                localStorage.setItem("inlineSVGrev", revision);
-            }
         } catch (error) {
             console.error("There was a problem with the network fetch operation:", error);
         }
