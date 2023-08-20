@@ -27,7 +27,6 @@ import Iconly from 'iconly'
 
 ```javascript
 new Iconly({
-	revision: '1',
 	file: './sprite.svg'
 })
 ```
