@@ -33,7 +33,7 @@ new Iconly({
 <br>
 
 ### File with icons
-<sub>sprite.svg</sub>
+<sub>icons.svg</sub>
 
 ```HTML
 <svg id="iconset" aria-hidden="true" style="width: 0; height: 0; position: absolute;">
