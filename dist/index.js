@@ -11,6 +11,7 @@ $parcel$export(module.exports, "default", () => $4fa36e821943b400$export$2e2bcd8
 class $4fa36e821943b400$export$2e2bcd8739ae039 {
     constructor(options){
         this.options = {
+            file: "./icons.svg",
             ...options
         };
         this.isLocalStorage = typeof window.localStorage !== "undefined";

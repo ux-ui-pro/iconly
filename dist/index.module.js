@@ -1,6 +1,7 @@
 class $cf838c15c8b009ba$export$2e2bcd8739ae039 {
     constructor(options){
         this.options = {
+            file: "./icons.svg",
             ...options
         };
         this.isLocalStorage = typeof window.localStorage !== "undefined";

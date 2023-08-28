@@ -1,6 +1,6 @@
 export default class Iconly {
 	constructor(options) {
-		this.options = { ...options }
+		this.options = { file: './icons.svg', ...options }
 		this.isLocalStorage = typeof window.localStorage !== 'undefined'
 		this.body = document.body
 
