@@ -22,13 +22,15 @@ $ yarn add iconly
 
 ### Import
 ```javascript
-import Iconly from 'iconly'
+import Iconly from 'iconly';
 ```
 
 ```javascript
-new Iconly({
-	file: './icons.svg'
-})
+const icons = new Iconly({
+  file: '/sprite.svg',
+});
+
+icons.init();
 ```
 <br>
 

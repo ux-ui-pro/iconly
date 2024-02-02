@@ -1,4 +1,4 @@
-class $cf838c15c8b009ba$export$2e2bcd8739ae039 {
+class $cf838c15c8b009ba$var$Iconly {
     constructor(options){
         this.options = {
             file: "./icons.svg",
@@ -6,7 +6,6 @@ class $cf838c15c8b009ba$export$2e2bcd8739ae039 {
         };
         this.isLocalStorage = typeof window.localStorage !== "undefined";
         this.body = document.body;
-        this.init().then();
     }
     async init() {
         const { file: file } = this.options;
@@ -38,6 +37,7 @@ class $cf838c15c8b009ba$export$2e2bcd8739ae039 {
         }
     }
 }
+var $cf838c15c8b009ba$export$2e2bcd8739ae039 = $cf838c15c8b009ba$var$Iconly;
 
 
 export {$cf838c15c8b009ba$export$2e2bcd8739ae039 as default};

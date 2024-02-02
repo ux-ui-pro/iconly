@@ -1,6 +1,8 @@
+
 function $parcel$defineInteropFlag(a) {
   Object.defineProperty(a, '__esModule', {value: true, configurable: true});
 }
+
 function $parcel$export(e, n, v, s) {
   Object.defineProperty(e, n, {get: v, set: s, enumerable: true, configurable: true});
 }
@@ -8,7 +10,7 @@ function $parcel$export(e, n, v, s) {
 $parcel$defineInteropFlag(module.exports);
 
 $parcel$export(module.exports, "default", () => $4fa36e821943b400$export$2e2bcd8739ae039);
-class $4fa36e821943b400$export$2e2bcd8739ae039 {
+class $4fa36e821943b400$var$Iconly {
     constructor(options){
         this.options = {
             file: "./icons.svg",
@@ -16,7 +18,6 @@ class $4fa36e821943b400$export$2e2bcd8739ae039 {
         };
         this.isLocalStorage = typeof window.localStorage !== "undefined";
         this.body = document.body;
-        this.init().then();
     }
     async init() {
         const { file: file } = this.options;
@@ -48,6 +49,7 @@ class $4fa36e821943b400$export$2e2bcd8739ae039 {
         }
     }
 }
+var $4fa36e821943b400$export$2e2bcd8739ae039 = $4fa36e821943b400$var$Iconly;
 
 
 //# sourceMappingURL=index.js.map
