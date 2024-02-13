@@ -7,7 +7,7 @@
 [![GitHub package version](https://img.shields.io/github/package-json/v/ux-ui-pro/iconly.svg)](https://github.com/ux-ui-pro/iconly)
 [![NPM Downloads](https://img.shields.io/npm/dm/iconly.svg?style=flat)](https://www.npmjs.org/package/iconly)
 
-<sup>500B gzipped</sup>
+<p>The Iconly class is designed to manage icons in a web application</p>
 <h3><a href="https://codepen.io/ux-ui/pen/zYmyqWR">Demo</a></h3>
 
 </div>
@@ -26,11 +26,13 @@ import Iconly from 'iconly';
 ```
 
 ```javascript
-const icons = new Iconly({
-  file: '/sprite.svg',
+const iconly = new Iconly({
+  file: './sprite.svg',
+  version: '1.0',
+  debug: true,
 });
 
-icons.init();
+iconly.init().then(() => console.log('Iconly is initialized and icons are loaded.'));
 ```
 <br>
 
@@ -38,7 +40,7 @@ icons.init();
 <sub>icons.svg</sub>
 
 ```HTML
-<svg id="iconset" aria-hidden="true" style="width: 0; height: 0; position: absolute;">
+<svg>
 	<symbol id="icon-one" viewBox="0 0 100 100">
 		<path ... />
 	</symbol>
@@ -53,7 +55,7 @@ icons.init();
 ### Usage
 ```HTML
 <svg>
-	<use xlink:href="#icon-name"></use>
+	<use href="#icon-name"></use>
 </svg>
 ```
 <br>
