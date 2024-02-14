@@ -13,6 +13,7 @@ class Iconly {
 			container: document.body || document.documentElement,
 			...options
 		};
+
 		this.#container = typeof this.#options.container === 'string' ? document.querySelector(this.#options.container) : this.#options.container;
 
 		if (!Iconly.#dbInstance) {
@@ -23,6 +24,7 @@ class Iconly {
 	async #openDB(name, version) {
 		if (!('indexedDB' in window)) {
 			this.#logError('This browser doesn\'t support IndexedDB');
+
 			return;
 		}
 
@@ -70,7 +72,7 @@ class Iconly {
 			iconSetDiv = document.createElement('div');
 			iconSetDiv.id = 'iconset';
 			iconSetDiv.setAttribute('aria-hidden', 'true');
-			iconSetDiv.style.cssText = 'width: 0; height: 0; position: absolute;';
+			iconSetDiv.style.cssText = 'width: 0px; height: 0px; display: none;';
 
 			this.#container.appendChild(iconSetDiv);
 		}

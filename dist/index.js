@@ -65,7 +65,7 @@ class $4fa36e821943b400$var$Iconly {
             iconSetDiv = document.createElement("div");
             iconSetDiv.id = "iconset";
             iconSetDiv.setAttribute("aria-hidden", "true");
-            iconSetDiv.style.cssText = "width: 0; height: 0; position: absolute;";
+            iconSetDiv.style.cssText = "width: 0px; height: 0px; display: none;";
             this.#container.appendChild(iconSetDiv);
         }
         iconSetDiv.innerHTML = data;
