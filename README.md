@@ -13,14 +13,16 @@
 </div>
 <br>
 
-### Installation
+&#10148; **Installation**
+
 ```
 $ yarn add iconly
 ```
 
 <br>
 
-### Import
+&#10148; **Import**
+
 ```javascript
 import Iconly from 'iconly';
 ```
@@ -36,29 +38,30 @@ iconly.init().then(() => console.log('Iconly is initialized and icons are loaded
 ```
 <br>
 
-### File with icons
-<sub>icons.svg</sub>
+&#10148; **File with icons**
 
 ```HTML
 <svg>
-	<symbol id="icon-one" viewBox="0 0 100 100">
-		<path ... />
-	</symbol>
-	<symbol id="icon-two" viewBox="0 0 100 100">
-		<path ... />
-	</symbol>
-	...
+  <symbol id="icon-one" viewBox="0 0 100 100">
+    <path ... />
+  </symbol>
+  <symbol id="icon-two" viewBox="0 0 100 100">
+    <path ... />
+  </symbol>
+  ...
 </svg>
 ```
 <br>
 
-### Usage
+&#10148; **Usage**
+
 ```HTML
 <svg>
-	<use href="#icon-name"></use>
+  <use href="#icon-name"></use>
 </svg>
 ```
 <br>
 
-### License
+&#10148; **License**
+
 <sup>iconly is released under MIT license</sup>

@@ -48,6 +48,7 @@ class Iconly {
 
 			throw error;
 		}
+
 		return db;
 	}
 

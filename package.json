@@ -1,6 +1,6 @@
 {
   "name": "iconly",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "SVG Sprite",
   "author": "ux-ui.pro",
   "license": "MIT",
@@ -37,6 +37,11 @@
     "icon",
     "icons",
     "sprite",
-    "IndexedDB"
+    "IndexedDB",
+    "vector",
+    "LocalStorage",
+    "mobile",
+    "ios",
+    "ui"
   ]
 }
