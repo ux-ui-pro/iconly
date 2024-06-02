@@ -3,22 +3,24 @@
 
 <h1>iconly</h1>
 
+<p><sup>Iconly is designed to load and cache SVG icons in the browser, using IndexedDB to store the data. It retrieves the icons from a given SVG file, stores them in IndexedDB, and inserts them into the DOM for easy access and use.</sup></p>
+
 [![npm](https://img.shields.io/npm/v/iconly.svg?colorB=brightgreen)](https://www.npmjs.com/package/iconly)
 [![GitHub package version](https://img.shields.io/github/package-json/v/ux-ui-pro/iconly.svg)](https://github.com/ux-ui-pro/iconly)
 [![NPM Downloads](https://img.shields.io/npm/dm/iconly.svg?style=flat)](https://www.npmjs.org/package/iconly)
 
-<p>The Iconly class is designed to manage icons in a web application</p>
-<h3><a href="https://codepen.io/ux-ui/pen/zYmyqWR">Demo</a></h3>
+<sup>1kB gzipped</sup>
+
+<a href="https://codepen.io/ux-ui/pen/zYmyqWR">Demo</a>
 
 </div>
 <br>
 
 &#10148; **Installation**
 
-```
+```console
 $ yarn add iconly
 ```
-
 <br>
 
 &#10148; **Import**
@@ -64,4 +66,4 @@ iconly.init().then(() => console.log('Iconly is initialized and icons are loaded
 
 &#10148; **License**
 
-<sup>iconly is released under MIT license</sup>
+iconly is released under MIT license
