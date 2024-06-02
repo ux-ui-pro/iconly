@@ -50,10 +50,10 @@ iconly.init().then(() => console.log('Iconly is initialized and icons are loaded
 <sub>File with icons</sub>
 ```HTML
 <svg preserveAspectRatio="none" fill="none">
-  <symbol id="icon-one" viewBox="0 0 100 100">
+  <symbol id="icon-one" viewBox="0 0 300 300">
     <path ... />
   </symbol>
-  <symbol id="icon-two" viewBox="0 0 100 100">
+  <symbol id="icon-two" viewBox="0 0 300 300">
     <path ... />
   </symbol>
   ...
