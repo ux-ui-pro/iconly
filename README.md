@@ -16,7 +16,7 @@
 </div>
 <br>
 
-&#10148; **Installation**
+&#10148; **Install**
 
 ```console
 $ yarn add iconly
@@ -28,6 +28,9 @@ $ yarn add iconly
 ```javascript
 import Iconly from 'iconly';
 ```
+<br>
+
+&#10148; **Usage**
 
 ```javascript
 const iconly = new Iconly({
@@ -38,12 +41,15 @@ const iconly = new Iconly({
 
 iconly.init().then(() => console.log('Iconly is initialized and icons are loaded.'));
 ```
-<br>
-
-&#10148; **File with icons**
 
 ```HTML
 <svg>
+  <use href="#icon-name"></use>
+</svg>
+```
+<sub>File with icons</sub>
+```HTML
+<svg preserveAspectRatio="none" fill="none">
   <symbol id="icon-one" viewBox="0 0 100 100">
     <path ... />
   </symbol>
@@ -55,13 +61,14 @@ iconly.init().then(() => console.log('Iconly is initialized and icons are loaded
 ```
 <br>
 
-&#10148; **Usage**
+&#10148; **Options**
 
-```HTML
-<svg>
-  <use href="#icon-name"></use>
-</svg>
-```
+|   Option    |          Type           |     Default     | Description                                                                                             |
+|:-----------:|:-----------------------:|:---------------:|:--------------------------------------------------------------------------------------------------------|
+|   `file`    |        `string`         | `'./icons.svg'` | The URL of the SVG file containing the icons.                                                           |
+|  `version`  |        `string`         |     `'1.0'`     | The version of the icon set.                                                                            |
+|   `debug`   |        `boolean`        |     `false`     | If `true`, debug information and errors will be logged to the console.                                  |
+| `container` | `string \| HTMLElement` | `document.body` | The container element where the icons will be injected. Can be a CSS selector string or an HTMLElement. |
 <br>
 
 &#10148; **License**
