@@ -1,7 +1,7 @@
 class Iconly {
-  static #dbInstance: Promise<IDBDatabase> | null = null;
+  private static dbInstance: Promise<IDBDatabase> | null = null;
 
-  #options: {
+  private readonly options: {
     file: string;
     version: string;
     debug: boolean;
@@ -16,7 +16,7 @@ class Iconly {
       container: document.body ?? document.documentElement,
     };
 
-    this.#options = {
+    this.options = {
       ...defaultOptions,
       ...options,
       container: typeof options.container === 'string'
@@ -24,18 +24,18 @@ class Iconly {
         : options.container ?? defaultOptions.container,
     };
 
-    if (!this.#options.container) {
+    if (!this.options.container) {
       throw new Error('Invalid container element');
     }
 
-    if (!Iconly.#dbInstance) {
-      Iconly.#dbInstance = this.#openDB('iconlyDB', 1);
+    if (!Iconly.dbInstance) {
+      Iconly.dbInstance = this.openDB('iconlyDB', 1);
     }
   }
 
-  async #openDB(name: string, version: number): Promise<IDBDatabase> {
+  private async openDB(name: string, version: number): Promise<IDBDatabase> {
     if (!('indexedDB' in window)) {
-      this.#logError('This browser doesn\'t support IndexedDB');
+      this.logError('This browser doesn\'t support IndexedDB');
       throw new Error('IndexedDB not supported');
     }
 
@@ -53,13 +53,13 @@ class Iconly {
     });
   }
 
-  static async #fetchData(file: string): Promise<string> {
+  private static async fetchData(file: string): Promise<string> {
     const response = await fetch(file);
     if (!response.ok) throw new Error('Network response was not ok');
     return response.text();
   }
 
-  #insert(data: string): void {
+  private insert(data: string): void {
     let iconSetDiv = document.getElementById('iconset');
 
     if (!iconSetDiv) {
@@ -67,33 +67,30 @@ class Iconly {
       iconSetDiv.id = 'iconset';
       iconSetDiv.setAttribute('aria-hidden', 'true');
       iconSetDiv.style.cssText = 'width: 0; height: 0; position: absolute; left: -9999px;';
-      this.#options.container.appendChild(iconSetDiv);
+      this.options.container.appendChild(iconSetDiv);
     }
 
     iconSetDiv.innerHTML = data;
   }
 
   async init(): Promise<void> {
-    const { file, version } = this.#options;
+    const { file, version } = this.options;
 
     try {
-      let data = await Iconly.#fetchData(file);
+      let data = await Iconly.fetchData(file);
 
-      const db = await Iconly.#dbInstance;
-      const tx = db.transaction('icons', 'readwrite');
-      const store = tx.objectStore('icons');
+      const db = await Iconly.dbInstance;
+      const store = db.transaction('icons', 'readwrite').objectStore('icons');
 
       const dbVersion = await new Promise<{ version: string; data: string } | undefined>((resolve, reject) => {
         const request = store.get(version);
-
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
 
-      if (!(dbVersion && dbVersion.data)) {
+      if (!dbVersion) {
         await new Promise<void>((resolve, reject) => {
           const request = store.put({ version, data });
-
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
         });
@@ -102,19 +99,20 @@ class Iconly {
       }
 
       await new Promise<void>((resolve, reject) => {
+        const tx = store.transaction;
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
         tx.onabort = () => reject(tx.error);
       });
 
-      this.#insert(data);
+      this.insert(data);
     } catch (error) {
-      this.#logError('Error initializing Iconly:', error);
+      this.logError('Error initializing Iconly:', error);
     }
   }
 
-  #logError(...messages: unknown[]): void {
-    if (this.#options.debug) {
+  private logError(...messages: unknown[]): void {
+    if (this.options.debug) {
       // eslint-disable-next-line no-console
       console.error(...messages);
     }

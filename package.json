@@ -1,6 +1,6 @@
 {
   "name": "iconly",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "Iconly is designed to load and cache SVG icons in the browser, using IndexedDB to store the data. It retrieves the icons from a given SVG file, stores them in IndexedDB, and inserts them into the DOM for easy access and use.",
   "author": "ux-ui.pro",
   "license": "MIT",
