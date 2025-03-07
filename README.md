@@ -9,7 +9,7 @@
 [![GitHub package version](https://img.shields.io/github/package-json/v/ux-ui-pro/iconly.svg)](https://github.com/ux-ui-pro/iconly)
 [![NPM Downloads](https://img.shields.io/npm/dm/iconly.svg?style=flat)](https://www.npmjs.org/package/iconly)
 
-<sup>1kB gzipped</sup>
+<sup>1.5kB gzipped</sup>
 
 <a href="https://codepen.io/ux-ui/pen/zYmyqWR">Demo</a>
 
@@ -49,11 +49,8 @@ iconly.init().then(() => console.log('Iconly is initialized and icons are loaded
 ```
 <sub>File with icons</sub>
 ```HTML
-<svg preserveAspectRatio="none" fill="none">
-  <symbol id="icon-one" viewBox="0 0 300 300">
-    <path ... />
-  </symbol>
-  <symbol id="icon-two" viewBox="0 0 300 300">
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="none">
+  <symbol id="icon-name" viewBox="0 0 300 300">
     <path ... />
   </symbol>
   ...
