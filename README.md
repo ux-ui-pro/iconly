@@ -93,5 +93,4 @@ After `init()`, the SVG sprite is injected into the `container` inside `<div dat
 - You can cancel a fetch by calling `iconLoader.abort()`, which results in a `fetch_aborted` error code.
 
 # License
-
 MIT
