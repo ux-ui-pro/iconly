@@ -1,50 +1,39 @@
 import { defineConfig } from 'vite';
-import terser from '@rollup/plugin-terser';
+import type { UserConfig } from 'vite';
+import type { ModuleFormat } from 'rollup';
 import dts from 'vite-plugin-dts';
 
-export default defineConfig({
-  plugins: [
-    dts({
-      outDir: 'dist',
-      insertTypesEntry: true,
-      entryRoot: 'src',
-      cleanVueFileName: true,
-    }),
-  ],
-  build: {
-    lib: {
-      entry: 'src/index.ts',
-      name: 'Iconly',
-      formats: ['es', 'cjs', 'umd'],
-      fileName: (format) => `index.${format}.js`,
-    },
-    emptyOutDir: true,
-    rollupOptions: {
-      plugins: [
-        terser({
-          compress: {
-            drop_console: true,
-            drop_debugger: true,
-            dead_code: true,
-            reduce_vars: true,
-            reduce_funcs: true,
-          },
-          mangle: {
-            toplevel: true,
-            keep_fnames: false,
-          },
-          format: {
-            comments: false,
-          },
-        }),
-      ],
-      output: {
-        assetFileNames: 'index.[ext]',
+export default defineConfig(({ command }: { command: 'build' | 'serve' }) => {
+  const config: UserConfig = {
+    plugins:
+      command === 'build'
+        ? [
+            dts({
+              outDir: 'dist',
+              insertTypesEntry: true,
+              entryRoot: 'src',
+              rollupTypes: true,
+            }),
+          ]
+        : [],
+    build: {
+      lib: {
+        entry: 'src/index.ts',
+        name: 'Iconly',
+        formats: ['es', 'cjs', 'umd'],
+        fileName: (format: ModuleFormat) =>
+          format === 'umd' ? 'index.umd.js' : `index.${format}.js`,
+      },
+      emptyOutDir: true,
+      sourcemap: true,
+      minify: 'esbuild',
+      rollupOptions: {
+        output: {
+          assetFileNames: 'index.[ext]',
+        },
       },
     },
-  },
-  server: {
-    open: true,
-    port: 3000,
-  },
+  };
+
+  return config;
 });
