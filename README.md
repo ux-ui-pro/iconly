@@ -34,6 +34,7 @@ import { createIconly } from 'iconly';
 - The injected sprite wrapper is now `[data-iconly="iconset"]` inside `container` (instead of `#iconset`).
 
 See `CHANGELOG.md` for details.
+
 <br>
 
 # Usage
@@ -91,6 +92,7 @@ After `init()`, the SVG sprite is injected into the `container` inside `<div dat
 - When `debug` is `false`, debug messages are suppressed (no `onDebug` calls and no `logger.debug`).
 - Errors still trigger `onError` and `logger.error` (if provided), even when `debug` is `false`.
 - You can cancel a fetch by calling `iconLoader.abort()`, which results in a `fetch_aborted` error code.
+<br>
 
 # License
 MIT
