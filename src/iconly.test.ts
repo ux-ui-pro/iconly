@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createIconly } from '../src/index';
+import { createIconly } from './index';
 
 const svgPayload = '<svg xmlns="http://www.w3.org/2000/svg"><symbol id="icon-name"></symbol></svg>';
 
