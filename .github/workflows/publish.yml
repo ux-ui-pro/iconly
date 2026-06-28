@@ -1,0 +1,27 @@
+# Publish to npm via Trusted Publishing (OIDC). Triggered by a published GitHub Release.
+# Requires a Trusted Publisher configured for this package on npmjs.com (no NPM_TOKEN, provenance auto).
+name: publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # required for OIDC Trusted Publishing + provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      # Trusted Publishing (OIDC) requires npm >= 11.5.1.
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run verify
+      - run: npm publish --provenance --access public

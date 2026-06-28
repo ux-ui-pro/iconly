@@ -14,50 +14,63 @@
   "homepage": "https://github.com/ux-ui-pro/iconly",
   "sideEffects": false,
   "type": "module",
+  "packageManager": "npm@10.9.3",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.19.0"
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "vite build",
-    "verify": "yarn lint && yarn typecheck && yarn test",
-    "lint": "biome check src tests",
-    "lint:fix": "biome check --write src tests",
-    "format": "biome format --write src tests",
+    "build": "tsdown",
+    "verify": "npm run lint && npm run typecheck && npm run test:unit && npm run build && npm run test:smoke && npm run pack:check",
+    "lint": "biome check src tests tsdown.config.ts vitest.config.ts",
+    "lint:fix": "biome check --write src tests tsdown.config.ts vitest.config.ts",
+    "format": "biome format --write src tests tsdown.config.ts vitest.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "prepublishOnly": "yarn clean && yarn build && yarn verify"
+    "test:unit": "vitest-runner run src",
+    "test": "npm run test:unit",
+    "test:smoke": "node --test \"tests/**/*.js\"",
+    "pack:check": "npm pack --dry-run && publint && attw --pack . --profile node16",
+    "prepublishOnly": "npm run clean && npm run verify"
   },
   "source": "src/index.ts",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "browser": "./dist/index.umd.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs.js",
-      "import": "./dist/index.es.js",
-      "default": "./dist/index.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
     "dist",
-    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
-    "@biomejs/biome": "2.3.12",
-    "@types/node": "25.0.10",
+    "@arethetypeswrong/cli": "^0.18.3",
+    "@biomejs/biome": "2.4.16",
+    "@types/node": "25.9.2",
+    "@ux-ui/biome-config": "^0.1.0",
+    "@ux-ui/tsconfig-base": "^0.1.0",
+    "@ux-ui/tsdown-config": "^0.1.0",
+    "@ux-ui/vitest-runner": "^0.1.0",
     "fake-indexeddb": "6.2.5",
     "jsdom": "27.4.0",
-    "rimraf": "6.1.2",
-    "typescript": "5.9.3",
-    "vite": "7.3.1",
-    "vite-plugin-dts": "4.5.4",
-    "vitest": "4.0.18"
+    "publint": "^0.3.21",
+    "rimraf": "6.1.3",
+    "tsdown": "0.22.3",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.9"
   },
   "keywords": [
     "icon",
