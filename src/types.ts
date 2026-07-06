@@ -40,6 +40,21 @@ export interface IconlyInstance {
 
 export type StorageStrategy = 'indexeddb' | 'memory' | 'session' | IconStorage;
 
+export interface IconlyIcon {
+  name: string;
+  viewBox: string;
+  body: string;
+}
+
+export interface SpriteConfig {
+  icons: IconlyIcon[];
+  container?: string | HTMLElement;
+}
+
+export interface SpriteInstance {
+  render: () => Result<void>;
+}
+
 export interface IconlyConfig {
   file?: string;
   version?: string;

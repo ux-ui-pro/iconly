@@ -45,6 +45,16 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./sprite": {
+      "import": {
+        "types": "./dist/sprite.d.ts",
+        "default": "./dist/sprite.js"
+      },
+      "require": {
+        "types": "./dist/sprite.d.cts",
+        "default": "./dist/sprite.cjs"
+      }
     }
   },
   "files": [

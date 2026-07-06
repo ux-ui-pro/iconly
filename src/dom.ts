@@ -2,6 +2,38 @@ import { createIconlyError } from './errors';
 import { err, ok } from './result';
 import type { Result } from './types';
 
+export const resolveContainer = (container?: string | HTMLElement): Result<HTMLElement> => {
+  if (typeof document === 'undefined') {
+    return err(
+      createIconlyError('container_invalid', 'Document is not available in this environment.'),
+    );
+  }
+
+  if (typeof container === 'string') {
+    const found = document.querySelector(container);
+
+    if (!found || !(found instanceof HTMLElement)) {
+      return err(
+        createIconlyError('container_invalid', `Invalid container selector: "${container}".`),
+      );
+    }
+
+    return ok(found);
+  }
+
+  if (container instanceof HTMLElement) {
+    return ok(container);
+  }
+
+  const fallback = document.body ?? document.documentElement;
+
+  if (!fallback) {
+    return err(createIconlyError('container_invalid', 'No valid container element found.'));
+  }
+
+  return ok(fallback);
+};
+
 export const insertSvg = (container: HTMLElement, data: string): Result<void> => {
   const found = container.querySelector('[data-iconly="iconset"]');
   let iconSetDiv: HTMLElement | null = found instanceof HTMLElement ? found : null;
