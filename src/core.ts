@@ -1,5 +1,4 @@
-import { insertSvg } from './dom';
-import { createIconlyError } from './errors';
+import { insertSvg, resolveContainer } from './dom';
 import { fetchSvg } from './fetcher';
 import { err, ok } from './result';
 import { resolveStorage } from './storage';
@@ -38,41 +37,6 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
     controller?.abort();
   };
 
-  const resolveContainer = (): Result<HTMLElement> => {
-    if (typeof document === 'undefined') {
-      return err(
-        createIconlyError('container_invalid', 'Document is not available in this environment.'),
-      );
-    }
-
-    if (typeof resolved.container === 'string') {
-      const found = document.querySelector(resolved.container);
-
-      if (!found || !(found instanceof HTMLElement)) {
-        return err(
-          createIconlyError(
-            'container_invalid',
-            `Invalid container selector: "${resolved.container}".`,
-          ),
-        );
-      }
-
-      return ok(found);
-    }
-
-    if (resolved.container instanceof HTMLElement) {
-      return ok(resolved.container);
-    }
-
-    const fallback = document.body ?? document.documentElement;
-
-    if (!fallback) {
-      return err(createIconlyError('container_invalid', 'No valid container element found.'));
-    }
-
-    return ok(fallback);
-  };
-
   const logDebug = (...messages: unknown[]): void => {
     if (!resolved.debug) {
       return;
@@ -94,7 +58,7 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
   };
 
   const init = async (): Promise<Result<void>> => {
-    const containerResult = resolveContainer();
+    const containerResult = resolveContainer(resolved.container);
 
     if (!containerResult.ok) {
       return fail(containerResult.error);
