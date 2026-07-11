@@ -2,7 +2,7 @@ import { insertSvg, resolveContainer } from './dom';
 import type { IconlyIcon, Result, SpriteConfig, SpriteInstance } from './types';
 
 const escapeAttr = (value: string): string =>
-  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 
 export const buildSpriteString = (icons: IconlyIcon[]): string => {
   const symbols = icons
@@ -16,7 +16,7 @@ export const buildSpriteString = (icons: IconlyIcon[]): string => {
 };
 
 export const createSprite = (config: SpriteConfig): SpriteInstance => {
-  const { icons, container } = config;
+  const { icons, container, sanitize } = config;
 
   return {
     render: (): Result<void> => {
@@ -26,9 +26,9 @@ export const createSprite = (config: SpriteConfig): SpriteInstance => {
         return containerResult;
       }
 
-      return insertSvg(containerResult.value, buildSpriteString(icons));
+      return insertSvg(containerResult.value, buildSpriteString(icons), { sanitize });
     },
   };
 };
 
-export type { IconlyIcon, SpriteConfig, SpriteInstance } from './types';
+export type { IconlyIcon, SpriteConfig, SpriteInstance, SvgSanitizer } from './types';

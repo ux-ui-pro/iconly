@@ -40,6 +40,12 @@ export interface IconlyInstance {
 
 export type StorageStrategy = 'indexeddb' | 'memory' | 'session' | IconStorage;
 
+export type SvgSanitizer = (svg: string) => string;
+
+export interface InsertSvgOptions {
+  sanitize?: SvgSanitizer;
+}
+
 export interface IconlyIcon {
   name: string;
   viewBox: string;
@@ -49,6 +55,7 @@ export interface IconlyIcon {
 export interface SpriteConfig {
   icons: IconlyIcon[];
   container?: string | HTMLElement;
+  sanitize?: SvgSanitizer;
 }
 
 export interface SpriteInstance {
@@ -64,6 +71,7 @@ export interface IconlyConfig {
   dbName?: string;
   storeName?: string;
   sessionKeyPrefix?: string;
+  sanitize?: SvgSanitizer;
   logger?: Logger;
   onError?: (error: IconlyError) => void;
   onDebug?: (...messages: unknown[]) => void;

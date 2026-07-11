@@ -1,6 +1,7 @@
 import { createIconlyError } from './errors';
 import { err, ok } from './result';
-import type { Result } from './types';
+import { prepareSvgData, sanitizeSvgElement } from './sanitize';
+import type { InsertSvgOptions, Result } from './types';
 
 export const resolveContainer = (container?: string | HTMLElement): Result<HTMLElement> => {
   if (typeof document === 'undefined') {
@@ -34,7 +35,11 @@ export const resolveContainer = (container?: string | HTMLElement): Result<HTMLE
   return ok(fallback);
 };
 
-export const insertSvg = (container: HTMLElement, data: string): Result<void> => {
+export const insertSvg = (
+  container: HTMLElement,
+  data: string,
+  options?: InsertSvgOptions,
+): Result<void> => {
   const found = container.querySelector('[data-iconly="iconset"]');
   let iconSetDiv: HTMLElement | null = found instanceof HTMLElement ? found : null;
 
@@ -47,7 +52,7 @@ export const insertSvg = (container: HTMLElement, data: string): Result<void> =>
   }
 
   const parser = new DOMParser();
-  const svgDoc = parser.parseFromString(data, 'image/svg+xml');
+  const svgDoc = parser.parseFromString(prepareSvgData(data, options?.sanitize), 'image/svg+xml');
   const parserError = svgDoc.querySelector('parsererror');
 
   if (parserError) {
@@ -66,6 +71,8 @@ export const insertSvg = (container: HTMLElement, data: string): Result<void> =>
   if (!svgEl) {
     return err(createIconlyError('parse_error', 'No valid SVG content found.'));
   }
+
+  sanitizeSvgElement(svgEl);
 
   const imported = document.importNode(svgEl, true);
 

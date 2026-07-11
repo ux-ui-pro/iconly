@@ -20,3 +20,6 @@ dist/
 .env
 .env.development
 .env.production
+
+# Handoff notes (local only)
+HANDOFF.md
