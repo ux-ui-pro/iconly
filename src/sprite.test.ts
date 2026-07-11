@@ -51,6 +51,19 @@ describe('buildSpriteString', () => {
     expect(svg).toContain('id="icon&quot;with&amp;ampersand"');
     expect(svg).toContain('viewBox="0 0 24&quot;24"');
   });
+
+  it('escapes greater-than in name and viewBox attributes', () => {
+    const icon: IconlyIcon = {
+      name: 'icon>name',
+      viewBox: '0>0 24 24',
+      body: '<path d="M0 0"/>',
+    };
+
+    const svg = buildSpriteString([icon]);
+
+    expect(svg).toContain('id="icon&gt;name"');
+    expect(svg).toContain('viewBox="0&gt;0 24 24"');
+  });
 });
 
 describe('createSprite', () => {

@@ -9,6 +9,7 @@ interface ResolvedIconlyConfig {
   version: string;
   debug: boolean;
   container?: string | HTMLElement;
+  sanitize?: IconlyConfig['sanitize'];
   logger?: IconlyConfig['logger'];
   onError?: IconlyConfig['onError'];
   onDebug?: IconlyConfig['onDebug'];
@@ -20,6 +21,7 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
     version: config.version ?? '1.0',
     debug: config.debug ?? false,
     container: config.container,
+    sanitize: config.sanitize,
     logger: config.logger,
     onError: config.onError,
     onDebug: config.onDebug,
@@ -95,7 +97,9 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
       logDebug('Using cached icon set', resolved.version);
     }
 
-    const insertResult = insertSvg(containerResult.value, data);
+    const insertResult = insertSvg(containerResult.value, data, {
+      sanitize: resolved.sanitize,
+    });
 
     if (!insertResult.ok) {
       return fail(insertResult.error);

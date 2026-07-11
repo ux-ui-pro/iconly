@@ -135,6 +135,7 @@ const svg = buildSpriteString([search, user, trash]);
 | `dbName` | `string` | `'iconlyDB'` | IndexedDB database name (for `indexeddb`). |
 | `storeName` | `string` | `'icons'` | IndexedDB store name (for `indexeddb`). |
 | `sessionKeyPrefix` | `string` | `'iconly'` | SessionStorage key prefix (for `session`). |
+| `sanitize` | `(svg: string) => string` | `undefined` | Optional hook to sanitize SVG before parsing. Runs before built-in hardening. |
 | `logger` | `{ debug?, error? }` | `undefined` | Optional logger for debug/error output. |
 | `onError` | `(error) => void` | `undefined` | Callback invoked on errors. |
 | `onDebug` | `(...args) => void` | `undefined` | Callback invoked for debug messages. |
@@ -145,6 +146,31 @@ const svg = buildSpriteString([search, user, trash]);
 | --- | --- | --- | --- |
 | `icons` | `IconlyIcon[]` | — | Icon objects to include in the sprite. |
 | `container` | `string \| HTMLElement` | `document.body` | Container where the sprite is injected. |
+| `sanitize` | `(svg: string) => string` | `undefined` | Optional hook to sanitize SVG before parsing. Runs before built-in hardening. |
+
+---
+
+## Security
+
+iconly injects SVG into the live DOM. Treat sprite files and icon objects as **trusted content**.
+
+- Do not pass `file` URLs or `icon.body` values from untrusted user input without sanitization.
+- `createIconly` and `createSprite` apply built-in hardening before insertion: event-handler attributes (`on*`), `<script>`, `<foreignObject>`, `javascript:` / `data:text/html` links, and SMIL animation elements targeting `href` are stripped.
+- Built-in hardening is defense in depth, not a full HTML sanitizer. It does not cover, for example, `<style>` CSS vectors or external references in `<use>` / `<image>`. For untrusted SVG, pass a `sanitize` hook and use a dedicated library such as [DOMPurify](https://github.com/cure53/DOMPurify):
+
+```ts
+import DOMPurify from 'dompurify';
+
+const iconLoader = createIconly({
+  file: userProvidedUrl, // only after your own URL allowlisting
+  sanitize: (svg) =>
+    DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true } }),
+});
+```
+
+`buildSpriteString` returns raw SVG and does not touch the DOM. When using it directly (SSR, tests), sanitize the output yourself if the source icons are not fully trusted.
+
+In `iconly/sprite`, `name` and `viewBox` are escaped in attributes; `body` is inserted as-is and sanitized only when rendered via `createSprite().render()` or when you sanitize the string yourself.
 
 ---
 

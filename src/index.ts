@@ -7,7 +7,9 @@ export type {
   IconlyInstance,
   IconRecord,
   IconStorage,
+  InsertSvgOptions,
   Logger,
   Result,
   StorageStrategy,
+  SvgSanitizer,
 } from './types';
