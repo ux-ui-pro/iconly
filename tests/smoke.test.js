@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import test from 'node:test';
+
+const require = createRequire(import.meta.url);
 
 const expectedArtifacts = [
   'dist/index.js',
@@ -25,8 +28,8 @@ test('public ESM API exports createIconly', async () => {
   assert.equal(typeof mod.createIconly, 'function');
 });
 
-test('public CJS API can be imported', async () => {
-  const mod = await import('../dist/index.cjs');
+test('public CJS API can be required', () => {
+  const mod = require('../dist/index.cjs');
 
   assert.equal(typeof mod.createIconly, 'function');
 });
@@ -38,8 +41,8 @@ test('public sprite ESM API exports buildSpriteString and createSprite', async (
   assert.equal(typeof mod.createSprite, 'function');
 });
 
-test('public sprite CJS API can be imported', async () => {
-  const mod = await import('../dist/sprite.cjs');
+test('public sprite CJS API can be required', () => {
+  const mod = require('../dist/sprite.cjs');
 
   assert.equal(typeof mod.buildSpriteString, 'function');
   assert.equal(typeof mod.createSprite, 'function');

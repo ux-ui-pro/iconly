@@ -13,17 +13,10 @@ export const createIndexedDbStorage = (options: IndexedDbOptions = {}): IconStor
 
   let dbPromise: Promise<IDBDatabase> | null = null;
 
-  const openDb = async (): Promise<IDBDatabase> => {
-    if (dbPromise) {
-      return dbPromise;
-    }
-
-    if (typeof indexedDB === 'undefined') {
-      throw createIconlyError('indexeddb_not_supported', 'IndexedDB is not supported.');
-    }
-
-    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
+  const requestDb = (version?: number): Promise<IDBDatabase> =>
+    new Promise<IDBDatabase>((resolve, reject) => {
+      const request =
+        version === undefined ? indexedDB.open(dbName) : indexedDB.open(dbName, version);
 
       request.onerror = (): void => {
         reject(
@@ -43,10 +36,41 @@ export const createIndexedDbStorage = (options: IndexedDbOptions = {}): IconStor
         }
       };
 
-      request.onsuccess = (): void => resolve(request.result);
+      request.onsuccess = (): void => {
+        const db = request.result;
+
+        db.onversionchange = (): void => {
+          db.close();
+          dbPromise = null;
+        };
+
+        if (db.objectStoreNames.contains(storeName)) {
+          resolve(db);
+          return;
+        }
+
+        const nextVersion = db.version + 1;
+
+        db.close();
+        requestDb(nextVersion).then(resolve, reject);
+      };
     });
 
-    return dbPromise;
+  const openDb = async (): Promise<IDBDatabase> => {
+    if (!dbPromise) {
+      if (typeof indexedDB === 'undefined') {
+        throw createIconlyError('indexeddb_not_supported', 'IndexedDB is not supported.');
+      }
+
+      dbPromise = requestDb();
+    }
+
+    try {
+      return await dbPromise;
+    } catch (error: unknown) {
+      dbPromise = null;
+      throw error;
+    }
   };
 
   const getStore = (db: IDBDatabase, mode: IDBTransactionMode): IDBObjectStore =>

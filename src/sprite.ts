@@ -1,4 +1,6 @@
 import { insertSvg, resolveContainer } from './dom';
+import { createIconlyError } from './errors';
+import { err } from './result';
 import type { IconlyIcon, Result, SpriteConfig, SpriteInstance } from './types';
 
 const escapeAttr = (value: string): string =>
@@ -20,13 +22,19 @@ export const createSprite = (config: SpriteConfig): SpriteInstance => {
 
   return {
     render: (): Result<void> => {
-      const containerResult = resolveContainer(container);
+      try {
+        const containerResult = resolveContainer(container);
 
-      if (!containerResult.ok) {
-        return containerResult;
+        if (!containerResult.ok) {
+          return containerResult;
+        }
+
+        return insertSvg(containerResult.value, buildSpriteString(icons), { sanitize });
+      } catch (error: unknown) {
+        return err(
+          createIconlyError('unexpected_error', 'Unexpected error while rendering sprite.', error),
+        );
       }
-
-      return insertSvg(containerResult.value, buildSpriteString(icons), { sanitize });
     },
   };
 };
