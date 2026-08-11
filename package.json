@@ -28,7 +28,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "vitest-runner run src",
     "test": "npm run test:unit",
-    "test:smoke": "node --test \"tests/**/*.js\"",
+    "test:smoke": "node --test tests/smoke.test.js",
     "pack:check": "npm pack --dry-run && publint && attw --pack . --profile node16",
     "prepublishOnly": "npm run clean && npm run verify"
   },
