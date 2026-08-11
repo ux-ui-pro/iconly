@@ -10,11 +10,17 @@ export const createSessionStorage = (options: SessionStorageOptions = {}): IconS
   const keyPrefix = options.keyPrefix ?? 'iconly';
 
   const resolveStorage = (): Result<Storage> => {
-    if (typeof window === 'undefined' || !window.sessionStorage) {
-      return err(createIconlyError('storage_unavailable', 'SessionStorage is not available.'));
-    }
+    try {
+      if (typeof window === 'undefined' || !window.sessionStorage) {
+        return err(createIconlyError('storage_unavailable', 'SessionStorage is not available.'));
+      }
 
-    return ok(window.sessionStorage);
+      return ok(window.sessionStorage);
+    } catch (error: unknown) {
+      return err(
+        createIconlyError('storage_unavailable', 'SessionStorage is not available.', error),
+      );
+    }
   };
 
   const get = async (version: string): Promise<Result<IconRecord | undefined>> => {

@@ -1,4 +1,5 @@
 import { insertSvg, resolveContainer } from './dom';
+import { createIconlyError } from './errors';
 import { fetchSvg } from './fetcher';
 import { err, ok } from './result';
 import { resolveStorage } from './storage';
@@ -14,6 +15,14 @@ interface ResolvedIconlyConfig {
   onError?: IconlyConfig['onError'];
   onDebug?: IconlyConfig['onDebug'];
 }
+
+const createCacheKey = (file: string, version: string, baseUrl: string): string => {
+  try {
+    return JSON.stringify([new URL(file, baseUrl).href, version]);
+  } catch {
+    return JSON.stringify([file, version]);
+  }
+};
 
 export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
   const resolved: ResolvedIconlyConfig = {
@@ -34,6 +43,7 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
   });
 
   let controller: AbortController | null = null;
+  let inFlight: Promise<Result<void>> | null = null;
 
   const abort = (): void => {
     controller?.abort();
@@ -44,13 +54,31 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
       return;
     }
 
-    resolved.onDebug?.(...messages);
-    resolved.logger?.debug?.('[Iconly debug]', ...messages);
+    try {
+      resolved.onDebug?.(...messages);
+    } catch {
+      // User callbacks must not break the Result contract.
+    }
+
+    try {
+      resolved.logger?.debug?.('[Iconly debug]', ...messages);
+    } catch {
+      // User callbacks must not break the Result contract.
+    }
   };
 
   const logError = (error: IconlyError): void => {
-    resolved.onError?.(error);
-    resolved.logger?.error?.('[Iconly error]', error);
+    try {
+      resolved.onError?.(error);
+    } catch {
+      // User callbacks must not break the Result contract.
+    }
+
+    try {
+      resolved.logger?.error?.('[Iconly error]', error);
+    } catch {
+      // User callbacks must not break the Result contract.
+    }
   };
 
   const fail = (error: IconlyError): Result<void> => {
@@ -59,22 +87,57 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
     return err(error);
   };
 
-  const init = async (): Promise<Result<void>> => {
-    const containerResult = resolveContainer(resolved.container);
+  const runInit = async (): Promise<Result<void>> => {
+    try {
+      const containerResult = resolveContainer(resolved.container);
 
-    if (!containerResult.ok) {
-      return fail(containerResult.error);
-    }
+      if (!containerResult.ok) {
+        return fail(containerResult.error);
+      }
 
-    const cacheResult = await storage.get(resolved.version);
+      const cacheKey = createCacheKey(
+        resolved.file,
+        resolved.version,
+        containerResult.value.ownerDocument.baseURI,
+      );
+      let cacheAvailable = true;
+      let data: string | undefined;
 
-    if (!cacheResult.ok) {
-      return fail(cacheResult.error);
-    }
+      try {
+        const cacheResult = await storage.get(cacheKey);
 
-    let data = cacheResult.value?.data;
+        if (cacheResult.ok) {
+          data = cacheResult.value?.data;
+        } else {
+          cacheAvailable = false;
+          logError(cacheResult.error);
+        }
+      } catch (error: unknown) {
+        cacheAvailable = false;
+        logError(
+          createIconlyError('storage_read_failed', 'Failed to read from icon storage.', error),
+        );
+      }
 
-    if (!data) {
+      if (data) {
+        const insertResult = insertSvg(containerResult.value, data, {
+          sanitize: resolved.sanitize,
+        });
+
+        if (insertResult.ok) {
+          logDebug('Using cached icon set', resolved.version);
+          logDebug('Iconly has successfully initialized.');
+
+          return ok(undefined);
+        }
+
+        if (insertResult.error.cause) {
+          return fail(insertResult.error);
+        }
+
+        logError(insertResult.error);
+      }
+
       controller = new AbortController();
 
       const fetchResult = await fetchSvg(resolved.file, controller.signal);
@@ -83,31 +146,50 @@ export const createIconly = (config: IconlyConfig = {}): IconlyInstance => {
         return fail(fetchResult.error);
       }
 
-      data = fetchResult.value;
-
-      const storeResult = await storage.set({
-        version: resolved.version,
-        data,
+      const insertResult = insertSvg(containerResult.value, fetchResult.value, {
+        sanitize: resolved.sanitize,
       });
 
-      if (!storeResult.ok) {
-        return fail(storeResult.error);
+      if (!insertResult.ok) {
+        return fail(insertResult.error);
       }
-    } else {
-      logDebug('Using cached icon set', resolved.version);
+
+      if (cacheAvailable) {
+        try {
+          const storeResult = await storage.set({
+            version: cacheKey,
+            data: fetchResult.value,
+          });
+
+          if (!storeResult.ok) {
+            logError(storeResult.error);
+          }
+        } catch (error: unknown) {
+          logError(
+            createIconlyError('storage_write_failed', 'Failed to write to icon storage.', error),
+          );
+        }
+      }
+
+      logDebug('Iconly has successfully initialized.');
+
+      return ok(undefined);
+    } catch (error: unknown) {
+      return fail(
+        createIconlyError('unexpected_error', 'Unexpected error while initializing Iconly.', error),
+      );
+    }
+  };
+
+  const init = (): Promise<Result<void>> => {
+    if (!inFlight) {
+      inFlight = runInit().finally(() => {
+        controller = null;
+        inFlight = null;
+      });
     }
 
-    const insertResult = insertSvg(containerResult.value, data, {
-      sanitize: resolved.sanitize,
-    });
-
-    if (!insertResult.ok) {
-      return fail(insertResult.error);
-    }
-
-    logDebug('Iconly has successfully initialized.');
-
-    return ok(undefined);
+    return inFlight;
   };
 
   return { init, abort };

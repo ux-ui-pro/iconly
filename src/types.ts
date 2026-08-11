@@ -10,7 +10,8 @@ export type IconlyErrorCode =
   | 'parse_error'
   | 'storage_read_failed'
   | 'storage_unavailable'
-  | 'storage_write_failed';
+  | 'storage_write_failed'
+  | 'unexpected_error';
 
 export interface IconlyError {
   code: IconlyErrorCode;
@@ -29,7 +30,7 @@ export interface IconRecord {
 }
 
 export interface IconStorage {
-  get(version: string): Promise<Result<IconRecord | undefined>>;
+  get(key: string): Promise<Result<IconRecord | undefined>>;
   set(record: IconRecord): Promise<Result<void>>;
 }
 

@@ -1,6 +1,6 @@
 # iconly
 
-A lightweight utility for SVG icon sprites in the browser. Load and cache an external sprite file (`iconly`), or build one from your own icon objects with tree-shaking (`iconly/sprite`).
+`iconly` gives you two ways to use SVG icon sprites in the browser: load and cache an external sprite file, or build one from your own icon objects without giving up tree-shaking.
 
 [![npm](https://img.shields.io/npm/v/iconly.svg?colorB=brightgreen)](https://www.npmjs.com/package/iconly)
 [![NPM Downloads](https://img.shields.io/npm/dm/iconly.svg?style=flat)](https://www.npmjs.com/package/iconly)
@@ -11,10 +11,11 @@ A lightweight utility for SVG icon sprites in the browser. Load and cache an ext
 
 ## Features
 
-- Factory-based API with `createIconly()` — fetch and cache an external sprite file.
-- IndexedDB, memory, or session storage strategies.
-- `iconly/sprite` — build a sprite from icon objects; no fetch, no storage, zero extra runtime deps.
-- `init()` and `render()` return a `Result` and never throw.
+- Load and cache external sprite files with `createIconly()`.
+- Choose between IndexedDB, memory, and session storage.
+- Keep cache entries separate for each sprite file and version.
+- Build sprites from icon objects with `iconly/sprite` — no fetch, storage, or extra runtime dependencies.
+- Handle failures through the `Result` returned by `init()` and `render()`; neither method throws.
 
 ---
 
@@ -45,7 +46,7 @@ if (!result.ok) {
 }
 ```
 
-After `init()`, the SVG sprite is injected into the `container` inside `<div data-iconly="iconset" aria-hidden="true">...</div>`.
+When `init()` succeeds, iconly adds the SVG sprite to the configured `container`, wrapped in `<div data-iconly="iconset" aria-hidden="true">...</div>`.
 
 ```html
 <svg>
@@ -53,7 +54,7 @@ After `init()`, the SVG sprite is injected into the `container` inside `<div dat
 </svg>
 ```
 
-Sprite file format:
+The sprite file should look like this:
 
 ```html
 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="none">
@@ -67,7 +68,7 @@ Sprite file format:
 
 ## Quick Start: icon objects
 
-Import icons as ESM modules — your bundler tree-shakes unused ones. iconly only assembles the sprite string and injects it into the DOM.
+Import icons as ESM modules and let your bundler remove the ones you do not use. iconly only assembles the sprite string and adds it to the DOM.
 
 ```ts
 import { createSprite } from 'iconly/sprite';
@@ -85,7 +86,7 @@ if (!result.ok) {
 }
 ```
 
-Icon object format (bring your own):
+Icons are plain objects:
 
 ```ts
 export const search = {
@@ -95,7 +96,7 @@ export const search = {
 };
 ```
 
-For SSR or tests — build the string without touching the DOM:
+For SSR or tests, you can build the sprite string without touching the DOM:
 
 ```ts
 import { buildSpriteString } from 'iconly/sprite';
@@ -131,13 +132,13 @@ const svg = buildSpriteString([search, user, trash]);
 | `version` | `string` | `'1.0'` | Version of the icon set. |
 | `debug` | `boolean` | `false` | Enables debug callbacks and logger debug output. |
 | `container` | `string \| HTMLElement` | `document.body` | Container where icons are injected. |
-| `storage` | `'indexeddb' \| 'memory' \| 'session'` | `'indexeddb'` | Storage strategy for caching icon data. |
+| `storage` | `'indexeddb' \| 'memory' \| 'session' \| IconStorage` | `'indexeddb'` | Storage strategy or custom storage implementation. |
 | `dbName` | `string` | `'iconlyDB'` | IndexedDB database name (for `indexeddb`). |
 | `storeName` | `string` | `'icons'` | IndexedDB store name (for `indexeddb`). |
 | `sessionKeyPrefix` | `string` | `'iconly'` | SessionStorage key prefix (for `session`). |
 | `sanitize` | `(svg: string) => string` | `undefined` | Optional hook to sanitize SVG before parsing. Runs before built-in hardening. |
 | `logger` | `{ debug?, error? }` | `undefined` | Optional logger for debug/error output. |
-| `onError` | `(error) => void` | `undefined` | Callback invoked on errors. |
+| `onError` | `(error) => void` | `undefined` | Callback invoked on fatal and recoverable errors. |
 | `onDebug` | `(...args) => void` | `undefined` | Callback invoked for debug messages. |
 
 ### `createSprite`
@@ -150,13 +151,36 @@ const svg = buildSpriteString([search, user, trash]);
 
 ---
 
+## Cache behavior
+
+- Each cache entry is keyed by the normalized `file` URL and `version`, so different sprites can safely share storage on the same origin.
+- Caching is best-effort. If iconly cannot read or write storage, it reports the error through `onError` / `logger.error`, then fetches and renders the sprite anyway.
+- If cached data is not a valid SVG document, iconly replaces it with a fresh copy from the network.
+- A fetched sprite is cached only after it has been parsed, hardened, and inserted successfully.
+- If you implement a custom `IconStorage`, treat both the key passed to `get()` and the value returned in `IconRecord.version` as opaque.
+
+---
+
+## Browser support
+
+Supported browsers:
+
+- Chrome and Edge 90+
+- Firefox 90+
+- Safari and iOS Safari 15+
+- Current Chrome for Android
+
+Internet Explorer and Legacy Edge are not supported. The external-sprite loader relies on native `fetch`, `AbortController`, `DOMParser`, and the selected Web Storage API. If IndexedDB or SessionStorage is unavailable, the sprite still loads, but without caching.
+
+---
+
 ## Security
 
-iconly injects SVG into the live DOM. Treat sprite files and icon objects as **trusted content**.
+Because iconly injects SVG into the live DOM, you should treat sprite files and icon objects as **trusted content**.
 
-- Do not pass `file` URLs or `icon.body` values from untrusted user input without sanitization.
-- `createIconly` and `createSprite` apply built-in hardening before insertion: event-handler attributes (`on*`), `<script>`, `<foreignObject>`, `javascript:` / `data:text/html` links, and SMIL animation elements targeting `href` are stripped.
-- Built-in hardening is defense in depth, not a full HTML sanitizer. It does not cover, for example, `<style>` CSS vectors or external references in `<use>` / `<image>`. For untrusted SVG, pass a `sanitize` hook and use a dedicated library such as [DOMPurify](https://github.com/cure53/DOMPurify):
+- Do not use `file` URLs or `icon.body` values from untrusted user input without sanitizing them first.
+- Before insertion, `createIconly` and `createSprite` strip event-handler attributes (`on*`), `<script>`, `<foreignObject>`, `javascript:` / `data:text/html` links, and SMIL animation elements targeting `href`.
+- This built-in hardening adds a layer of protection, but it is not a full HTML sanitizer. It does not cover every vector, including CSS in `<style>` or external references in `<use>` / `<image>`. For untrusted SVG, provide a `sanitize` hook backed by a dedicated library such as [DOMPurify](https://github.com/cure53/DOMPurify):
 
 ```ts
 import DOMPurify from 'dompurify';
@@ -168,18 +192,18 @@ const iconLoader = createIconly({
 });
 ```
 
-`buildSpriteString` returns raw SVG and does not touch the DOM. When using it directly (SSR, tests), sanitize the output yourself if the source icons are not fully trusted.
+`buildSpriteString` returns raw SVG without touching the DOM. If you use it directly for SSR or tests, sanitize the output yourself unless you fully trust the source icons.
 
-In `iconly/sprite`, `name` and `viewBox` are escaped in attributes; `body` is inserted as-is and sanitized only when rendered via `createSprite().render()` or when you sanitize the string yourself.
+In `iconly/sprite`, `name` and `viewBox` are escaped in attributes. The `body` value is inserted as-is and is sanitized only by `createSprite().render()` or by your own sanitizer.
 
 ---
 
 ## Error handling
 
-- `init()` and `render()` never throw; they return a `Result` with `ok: false` and `error` details.
-- When `debug` is `false`, debug messages are suppressed.
-- Errors still trigger `onError` and `logger.error` (if provided), even when `debug` is `false`.
-- Call `iconLoader.abort()` to cancel a fetch (`fetch_aborted` error code).
+- `init()` and `render()` never throw. On failure, they return a `Result` with `ok: false` and error details.
+- Setting `debug` to `false` suppresses debug messages.
+- Fatal and recoverable cache errors still trigger `onError` and `logger.error` (if provided), even when debugging is off. This means a recoverable cache error may be reported while `init()` returns `ok: true`.
+- Use `iconLoader.abort()` to cancel a fetch. The resulting error code is `fetch_aborted`.
 
 ---
 

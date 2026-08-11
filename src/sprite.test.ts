@@ -113,4 +113,27 @@ describe('createSprite', () => {
 
     expect(symbol?.getAttribute('id')).toBe('icon"with&ampersand');
   });
+
+  it('returns a Result when the container selector is invalid', () => {
+    const result = createSprite({ icons: [search], container: '[' }).render();
+
+    expect(result).toEqual({
+      ok: false,
+      error: expect.objectContaining({ code: 'container_invalid' }),
+    });
+  });
+
+  it('returns a Result when a sanitizer throws', () => {
+    const result = createSprite({
+      icons: [search],
+      sanitize: () => {
+        throw new Error('sanitize failed');
+      },
+    }).render();
+
+    expect(result).toEqual({
+      ok: false,
+      error: expect.objectContaining({ code: 'parse_error' }),
+    });
+  });
 });
